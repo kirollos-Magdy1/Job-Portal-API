@@ -7,6 +7,7 @@ const notFound = require("./middleware/not-found");
 const errorHandler = require("./middleware/error-handler");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const auth = require("./routes/authRoutes");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -16,6 +17,8 @@ app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 
 // routes
+app.use("/api/auth", auth);
+
 app.use(notFound);
 app.use(errorHandler);
 
