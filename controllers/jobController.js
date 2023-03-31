@@ -7,6 +7,10 @@ const createJob = (req, res) => {
     res.status(StatusCodes.CREATED).json({ job });
 };
 
+const getAllJobs = (req, res) => {
+  res.status(StatusCodes.OK).json({ jobs });
+};
 module.exports = {
     createJob,
+    getAllJobs
 };
