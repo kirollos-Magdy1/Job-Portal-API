@@ -1,24 +1,18 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-
-let companies = [
-  {
-    id: "1112",
-    companyWebsite: "https://",
-    companyLocation: "cairo",
-    numberOfEmployees: 100,
-  },
-];
+const Company = require("../models/Company");
 
 const createCompany = (req, res) => {
-  const company = req.body;
-  companies.push(company);
+  const company = Company.create(req.body);
 
   res.status(StatusCodes.CREATED).json({ company });
 };
 
 const getCompany = (req, res) => {
-  const company = companies.find((c) => c.id === req.params.id);
+  const company = Company.findOne(req.params.id);
+  if (companies.length === 0) {
+    throw new CustomError.NotFoundError("No companies found");
+  }
 
   res.status(StatusCodes.OK).json({ company });
 };
