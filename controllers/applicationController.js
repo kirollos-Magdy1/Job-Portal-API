@@ -1,17 +1,36 @@
+const Application = require("../models/Application");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 
-let applications = [
-  {
-    id: "12345",
-    jobId: "6789",
-    candidateId: "1011234",
-    date: Date.now(),
-  },
-];
+const applyForJob = async (req, res) => {
+  req.body.candidate = req.user.id;
+  const applicationExists = await Application.findOne({
+    candidate: req.body.candidate,
+    job: req.body.job,
+  });
+  if (applicationExists) {
+    throw new CustomError.BadRequestError(
+      `candidate already applied for this position`
+    );
+  }
 
-const getallApps = (req, res) => {
-  res.status(StatusCodes.OK).json({ applications });
+  const application = await Application.create(req.body);
+  res.status(StatusCodes.CREATED).json({ application });
 };
 
-module.exports = { getallApps };
+const getAllApps = async (req, res) => {
+  const applications = await Application.find({
+    candidate: req.user.id,
+  })
+    .populate({
+      path: "candidate",
+      select: "-password",
+    })
+    .populate({ path: "job" });
+
+  if (!applications) {
+    throw new CustomError.NotFoundError(`No applications found`);
+  }
+  res.status(StatusCodes.OK).json({ applications });
+};
+module.exports = { applyForJob, getAllApps };
