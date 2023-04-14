@@ -1,29 +1,34 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const { attachCookiesToResponse } = require("../utils");
-let users = [];
+const User = require("../models/User");
 
-const createUser = (req, res) => {
-  const { name, email, password, role, company } = req.body;
+const register = async (req, res) => {
+  const { email, password, confirmPassword } = req.body;
 
-  const user = { name, email, password, role, company };
-  console.log(user);
-  users.push(user);
+  if (!email || !password) {
+    throw new CustomError.BadRequestError("Please provide email and password");
+  }
+
+  if (password !== confirmPassword) {
+    throw new CustomError.BadRequestError("passwords did not match");
+  }
+
+  const emailAlreadyExists = await User.findOne({ email });
+  if (emailAlreadyExists) {
+    throw new CustomError.BadRequestError("Email already exists");
+  }
+
+  const user = await User.create(req.body);
   const tokenUser = {
     name: user.name,
     id: user._id,
     role: user.role,
   };
-
   attachCookiesToResponse({ res, user: tokenUser });
   res.status(StatusCodes.CREATED).json({ user: tokenUser });
 };
 
-const getAllUsers = (req, res) => {
-  res.status(StatusCodes.CREATED).json({ users });
-};
-
 module.exports = {
-  createUser,
-  getAllUsers,
+  register,
 };
