@@ -16,8 +16,18 @@ const getAllJobs = async (req, res) => {
   res.status(StatusCodes.OK).json({ jobs });
 };
 
+const getAllMyJobs = async (req, res) => {
+  const jobs = await Job.find({ hr: req.user.id });
+  if (!jobs.length) {
+    throw new CustomError.NotFoundError(
+      `No jobs found for hr ${req.user.name}`
+    );
+  }
+  res.status(StatusCodes.OK).json({ jobs });
+};
 
 module.exports = {
   createJob,
   getAllJobs,
+  getAllMyJobs,
 };
