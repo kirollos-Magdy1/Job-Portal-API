@@ -1,29 +1,74 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const { attachCookiesToResponse } = require("../utils");
-let users = [];
+const User = require("../models/User");
 
-const createUser = (req, res) => {
-  const { name, email, password, role, company } = req.body;
+const register = (Role) => {
+  return async (req, res) => {
+    req.body.role = Role;
+    const { email, password, "confirm-password": confirmPassword } = req.body;
+    if (!email || !password) {
+      throw new CustomError.BadRequestError(
+        "Please provide email and password"
+      );
+    }
 
-  const user = { name, email, password, role, company };
-  console.log(user);
-  users.push(user);
+    if (password !== confirmPassword) {
+      throw new CustomError.BadRequestError("passwords did not match");
+    }
+
+    const emailAlreadyExists = await User.findOne({ email });
+    if (emailAlreadyExists) {
+      throw new CustomError.BadRequestError("Email already exists");
+    }
+
+    const user = await User.create(req.body);
+    const tokenUser = {
+      name: user.name,
+      id: user._id,
+      role: user.role,
+    };
+    attachCookiesToResponse({ res, user: tokenUser });
+    res.status(StatusCodes.CREATED).json({ user: tokenUser });
+  };
+};
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new CustomError.BadRequestError("Please provide email and password");
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new CustomError.UnauthenticatedError("Invalid Credentials");
+  }
+
+  const isPasswordCorrect = await user.comparePassword(password);
+
+  if (!isPasswordCorrect) {
+    throw new CustomError.UnauthenticatedError("Invalid Credentials");
+  }
   const tokenUser = {
     name: user.name,
     id: user._id,
     role: user.role,
   };
-
   attachCookiesToResponse({ res, user: tokenUser });
   res.status(StatusCodes.CREATED).json({ user: tokenUser });
 };
 
-const getAllUsers = (req, res) => {
-  res.status(StatusCodes.CREATED).json({ users });
+const logout = (req, res) => {
+  res.cookie("token", "logout", {
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000),
+  });
+  res.status(StatusCodes.OK).json({ msg: "user logged out!" });
 };
 
 module.exports = {
-  createUser,
-  getAllUsers,
+  register,
+  login,
+  logout,
 };
