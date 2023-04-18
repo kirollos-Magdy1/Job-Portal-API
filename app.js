@@ -8,6 +8,7 @@ const errorHandler = require("./middleware/error-handler");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const auth = require("./routes/authRoutes");
+const user = require("./routes/userRoutes");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -18,6 +19,7 @@ app.use(cookieParser(process.env.JWT_SECRET));
 
 // routes
 app.use("/api/auth", auth);
+app.use("/api/user", user);
 
 app.use(notFound);
 app.use(errorHandler);
