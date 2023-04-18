@@ -25,4 +25,5 @@ router
   .route("/:id/applications")
   .get(authenticate, authorize("hr"), getSingleJobApps);
 
+
 module.exports = router;

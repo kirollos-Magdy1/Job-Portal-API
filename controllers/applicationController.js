@@ -61,6 +61,7 @@ const getSingleJobApps = async (req, res) => {
     throw new CustomError.NotFoundError(`No applications found for this job`);
   }
   res.status(StatusCodes.OK).json({ applications });
+
 };
 const editAppStatus = async (req, res) => {
   const appId = req.params.id;
@@ -104,3 +105,4 @@ module.exports = {
   deleteApp,
   editAppStatus,
 };
+
