@@ -9,6 +9,9 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const auth = require("./routes/authRoutes");
 const user = require("./routes/userRoutes");
+const company = require("./routes/companyRoutes");
+const job = require("./routes/jobRoutes");
+const application = require("./routes/applicationRoute");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -20,6 +23,9 @@ app.use(cookieParser(process.env.JWT_SECRET));
 // routes
 app.use("/api/auth", auth);
 app.use("/api/user", user);
+app.use("/api/company", company);
+app.use("/api/job", job);
+app.use("/api/application", application);
 
 app.use(notFound);
 app.use(errorHandler);
