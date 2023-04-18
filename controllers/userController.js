@@ -3,7 +3,7 @@ const CustomError = require("../errors");
 const User = require("../models/User");
 
 const showMe = async (req, res) => {
-  const user = await User.findOne({ _id: req.user.id });
+  const user = await User.findOne({ _id: req.user.id }).select("-password");
   if (!user) {
     throw new CustomError.NotFoundError("user not found");
   }
