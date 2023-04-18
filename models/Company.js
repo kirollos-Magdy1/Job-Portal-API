@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const companySchema = new mongoose.Schema({
+  hr: {
+    type: mongoose.Types.ObjectId,
+    ref: "User",
+    unique: [true, "hr exists"],
+  },
   name: {
     type: String,
   },
