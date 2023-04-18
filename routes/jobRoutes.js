@@ -12,5 +12,10 @@ router
   .route("/")
   .post(authenticate, authorize("hr"), createJob)
   .get(getAllJobs);
-router.route("/:id").get(getSingleJob);
+
+  router
+  .route("/:id")
+  .get(getSingleJob)
+  .patch(authenticate, authorize("hr"), editJob)
+  .delete(authenticate, authorize("hr"), deleteJob);
 module.exports = router;
