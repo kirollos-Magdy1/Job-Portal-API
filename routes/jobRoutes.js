@@ -6,6 +6,8 @@ const {
   createJob,
   getAllJobs,
   getSingleJob,
+  editJob,
+  deleteJob,
 } = require("../controllers/jobController");
 
 router
